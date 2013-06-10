@@ -2,9 +2,8 @@ ADTickerLabel
 =============
 -------------
 
-An objective-c UIView which provide a mechanism to show numbers with rolling effect, like in counter.
+An objective-c UIView which provide a mechanism to show numbers with rolling effect, like in counter. Click to see video
 
-Click to see video
 [![](https://dl.dropbox.com/u/25847340/ADTickerLabel/screenshot-thumb.png)](https://dl.dropbox.com/u/25847340/ADTickerLabel/video.mp4)
 
 ------------
