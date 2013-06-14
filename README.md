@@ -34,7 +34,7 @@ Source files
 Another way to add the ADGraphView to your project is to directly add the source files and resources to your project.
 
 1. Download the [latest code version](https://github.com/Antondomashnev/ADTickerLabel/downloads) or add the repository as a git submodule to your git-tracked project. 
-2. Open your project in Xcode, than drag and drop all files from Source directory and GraphResources onto your project (use the "Product Navigator view"). Make sure to select Copy items when asked if you extracted the code archive outside of your project. 
+2. Open your project in Xcode, than drag and drop ADTickerLabel.h and ADTickerLabel.m files onto your project (use the "Product Navigator view"). Make sure to select Copy items when asked if you extracted the code archive outside of your project. 
 3. Include ADGraphView wherever you need it with `#import "ADTickerLabel.h"`.
 
 -----
@@ -66,6 +66,6 @@ This code is distributed under the terms and conditions of the MIT license.
 Change-log
 ==========
 
-**Version 0.5** @ 25.2.13
+**Version 0.5** @ 10.6.13
 
 - Initial release.
