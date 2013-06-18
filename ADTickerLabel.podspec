@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "ADTickerLabel"
-  s.version      = "0.57"
+  s.version      = "0.59"
   s.summary      = "ADTickerLabel An objective-c UIView which provide a mechanism to show numbers with rolling effect, like in counter."
   s.description  = <<-DESC
                     ADTickerLabel An objective-c UIView which provide a mechanism to show numbers with rolling effect, like in counter.
