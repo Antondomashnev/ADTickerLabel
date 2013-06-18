@@ -31,6 +31,7 @@
     self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(100, 50, 0, font.lineHeight)];
     self.tickerLabel.font = font;
     self.tickerLabel.characterWidth = 8;
+    self.tickerLabel.textChangeAnimationDuration = 0.5;
     [self.view addSubview: self.tickerLabel];
 }
 

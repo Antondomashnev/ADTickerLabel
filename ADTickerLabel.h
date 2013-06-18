@@ -23,4 +23,10 @@
  */
 @property (nonatomic, strong) NSString *text;
 
+/*
+ Text changing animation duration in seconds
+ Default 1 second
+ */
+@property (nonatomic, unsafe_unretained) float textChangeAnimationDuration;
+
 @end

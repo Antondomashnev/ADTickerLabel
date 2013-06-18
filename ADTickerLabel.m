@@ -15,6 +15,7 @@
 @property (nonatomic, strong) NSString *selectedCharacter;
 @property (nonatomic, strong) UILabel *textLabel;
 
+@property (nonatomic, unsafe_unretained) float textChangeAnimationDuration;
 @property (nonatomic, unsafe_unretained) NSInteger selectedCharacterIndex;
 
 - (void)setSelectedCharacter:(NSString *)selectedCharacter animated:(BOOL)animated;
@@ -69,7 +70,7 @@
     CGRect newFrame = self.frame;
     newFrame.origin.y = positionY;
     
-    [UIView animateWithDuration:1 animations:^{
+    [UIView animateWithDuration:self.textChangeAnimationDuration animations:^{
         self.frame = newFrame;
     } completion:^(BOOL finished) {
         
@@ -125,6 +126,7 @@
 @synthesize font = _font;
 @synthesize characterWidth = _characterWidth;
 @synthesize textColor = _textColor;
+@synthesize textChangeAnimationDuration = _textChangeAnimationDuration;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -136,6 +138,7 @@
         self.font = [UIFont systemFontOfSize: 12.];
         self.textColor = [UIColor blackColor];
         self.characterViewsArray = [NSMutableArray array];
+        self.textChangeAnimationDuration = 1;
         
         [self addMaskLayer];
     }
@@ -196,6 +199,7 @@
     numbericView.selectedCharacter = @"0";
     numbericView.selectedCharacterIndex = 0;
     numbericView.charactersArray = charactersArray;
+    numbericView.textChangeAnimationDuration = self.textChangeAnimationDuration;
     
     [self addSubview: numbericView];
     
@@ -292,6 +296,18 @@
         _characterWidth = characterWidth;
         
         [self updateUIFrames];
+    }
+}
+
+- (void)setTextChangeAnimationDuration:(float)textChangeAnimationDuration{
+    
+    if(_textChangeAnimationDuration != textChangeAnimationDuration){
+        
+        _textChangeAnimationDuration = textChangeAnimationDuration;
+        
+        [self.characterViewsArray enumerateObjectsUsingBlock:^(ADTickerCharacterView *obj, NSUInteger idx, BOOL *stop) {
+            obj.textChangeAnimationDuration = textChangeAnimationDuration;
+        }];
     }
 }
 
