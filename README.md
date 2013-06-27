@@ -66,6 +66,10 @@ This code is distributed under the terms and conditions of the MIT license.
 Change-log
 ==========
 
+**Version 0.59 @ 22.6.13
+
+- Add support terxt changing animation speed.
+
 **Version 0.5** @ 10.6.13
 
 - Initial release.
