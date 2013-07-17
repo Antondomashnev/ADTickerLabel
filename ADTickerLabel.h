@@ -39,4 +39,19 @@ typedef enum{
  */
 @property (nonatomic, unsafe_unretained) ADTickerLabelScrollDirection scrollDirection;
 
+/*
+ Default nil
+ */
+@property (nonatomic, strong) UIColor *shadowColor;
+
+/*
+ Default CGSizeMake(0, 0)
+ */
+@property (nonatomic, unsafe_unretained) CGSize shadowOffset;
+
+/*
+ Default ADTickerLabelScrollDirectionUp
+ */
+@property (nonatomic, unsafe_unretained) ADTickerLabelScrollDirection scrollDirection;
+
 @end

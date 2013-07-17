@@ -339,6 +339,20 @@
     }
 }
 
+- (void)setShadowOffset:(CGSize)shadowOffset{
+    
+    [self.characterViewsArray enumerateObjectsUsingBlock:^(ADTickerCharacterView *obj, NSUInteger idx, BOOL *stop) {
+        obj.textLabel.shadowOffset = shadowOffset;
+    }];
+}
+
+- (void)setShadowColor:(UIColor *)shadowColor{
+    
+    [self.characterViewsArray enumerateObjectsUsingBlock:^(ADTickerCharacterView *obj, NSUInteger idx, BOOL *stop) {
+        obj.textLabel.shadowColor = shadowColor;
+    }];
+}
+
 - (void)setTextColor:(UIColor *)textColor{
     
     if(![_textColor isEqual: textColor]){
