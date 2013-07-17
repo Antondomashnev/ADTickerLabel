@@ -8,6 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+typedef enum{
+    ADTickerLabelScrollDirectionUp = 1,
+    ADTickerLabelScrollDirectionDown = 2
+}ADTickerLabelScrollDirection;
+
 @interface ADTickerLabel : UIView
 
 @property (nonatomic, strong) UIFont *font;
@@ -24,9 +29,14 @@
 @property (nonatomic, strong) NSString *text;
 
 /*
- Text changing animation duration in seconds
- Default 1 second
+ Change text animation duration in seconds
+ Default 1 seconds
  */
-@property (nonatomic, unsafe_unretained) float textChangeAnimationDuration;
+@property (nonatomic, unsafe_unretained) float changeTextAnimationDuration;
+
+/*
+ Default ADTickerLabelScrollDirectionUp
+ */
+@property (nonatomic, unsafe_unretained) ADTickerLabelScrollDirection scrollDirection;
 
 @end

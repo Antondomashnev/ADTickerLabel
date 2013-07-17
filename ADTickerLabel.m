@@ -15,7 +15,8 @@
 @property (nonatomic, strong) NSString *selectedCharacter;
 @property (nonatomic, strong) UILabel *textLabel;
 
-@property (nonatomic, unsafe_unretained) float textChangeAnimationDuration;
+@property (nonatomic, unsafe_unretained) float changeTextAnimationDuration;
+@property (nonatomic, unsafe_unretained) ADTickerLabelScrollDirection scrollDirection;
 @property (nonatomic, unsafe_unretained) NSInteger selectedCharacterIndex;
 
 - (void)setSelectedCharacter:(NSString *)selectedCharacter animated:(BOOL)animated;
@@ -28,6 +29,7 @@
 @synthesize charactersArray = _charactersArray;
 @synthesize selectedCharacter = _selectedCharacter;
 @synthesize textLabel = _textLabel;
+@synthesize changeTextAnimationDuration = _changeTextAnimationDuration;
 
 - (id)initWithFrame:(CGRect)frame textLabel:(UILabel *)textLabel{
     
@@ -70,7 +72,7 @@
     CGRect newFrame = self.frame;
     newFrame.origin.y = positionY;
     
-    [UIView animateWithDuration:self.textChangeAnimationDuration animations:^{
+    [UIView animateWithDuration:self.changeTextAnimationDuration animations:^{
         self.frame = newFrame;
     } completion:^(BOOL finished) {
         
@@ -80,34 +82,69 @@
 
 - (void)setSelectedCharacter:(NSString *)selectedCharacter animated:(BOOL)animated{
     
-    NSInteger selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter];
-    
-    if(selectedCharacterIndex > self.selectedCharacterIndex){
+    if(self.scrollDirection == ADTickerLabelScrollDirectionUp){
         
-        [self animateToPositionY:[self positionYForCharacterAtIndex: selectedCharacterIndex] withCallback:^{
-            self.selectedCharacter = selectedCharacter;
-            self.selectedCharacterIndex = selectedCharacterIndex;
-        }];
-    }
-    else if(selectedCharacterIndex < self.selectedCharacterIndex){
+        NSInteger selectedCharacterIndex = [selectedCharacter integerValue];
         
-        //We try to find the chatracter in secod part of array
-        for(int i = [self.charactersArray count] / 2; i < [self.charactersArray count]; i++){
+        if(selectedCharacterIndex < self.selectedCharacterIndex){
             
-            if([self.charactersArray[i] isEqualToString: selectedCharacter]){
-                selectedCharacterIndex = i;
-                break;
-            }
+            [self animateToPositionY:[self positionYForCharacterAtIndex: selectedCharacterIndex] withCallback:^{
+                self.selectedCharacter = selectedCharacter;
+                self.selectedCharacterIndex = selectedCharacterIndex;
+            }];
         }
-        
-        [self animateToPositionY:[self positionYForCharacterAtIndex: selectedCharacterIndex] withCallback:^{
-            self.selectedCharacter = selectedCharacter;
-            self.selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter];
+        else if(selectedCharacterIndex > self.selectedCharacterIndex){
             
-            CGRect newFrame = self.frame;
-            newFrame.origin.y = [self positionYForCharacterAtIndex: self.selectedCharacterIndex];
-            self.frame = newFrame;
-        }];
+            //We try to find the chatracter in secod part of array
+            for(int i = [self.charactersArray count] / 2; i < [self.charactersArray count]; i++){
+                
+                if([self.charactersArray[i] isEqualToString: selectedCharacter]){
+                    selectedCharacterIndex = i;
+                    break;
+                }
+            }
+            
+            [self animateToPositionY:[self positionYForCharacterAtIndex: selectedCharacterIndex] withCallback:^{
+                self.selectedCharacter = selectedCharacter;
+                self.selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter];
+                
+                CGRect newFrame = self.frame;
+                newFrame.origin.y = [self positionYForCharacterAtIndex: self.selectedCharacterIndex];
+                self.frame = newFrame;
+            }];
+        }
+    }
+    else{
+        
+        NSInteger selectedCharacterIndex = [self.charactersArray count] - 1 - [selectedCharacter integerValue];
+        
+        if(selectedCharacterIndex < self.selectedCharacterIndex){
+            
+            [self animateToPositionY:[self positionYForCharacterAtIndex: selectedCharacterIndex] withCallback:^{
+                self.selectedCharacter = selectedCharacter;
+                self.selectedCharacterIndex = selectedCharacterIndex;
+            }];
+        }
+        else if(selectedCharacterIndex > self.selectedCharacterIndex){
+            
+            //We try to find the chatracter in secod part of array
+            for(int i = [self.charactersArray count] / 2; i > 0; i--){
+                
+                if([self.charactersArray[i] isEqualToString: selectedCharacter]){
+                    selectedCharacterIndex = i;
+                    break;
+                }
+            }
+            
+            [self animateToPositionY:[self positionYForCharacterAtIndex: selectedCharacterIndex] withCallback:^{
+                self.selectedCharacter = selectedCharacter;
+                self.selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter];
+                
+                CGRect newFrame = self.frame;
+                newFrame.origin.y = [self positionYForCharacterAtIndex: self.selectedCharacterIndex];
+                self.frame = newFrame;
+            }];
+        }
     }
 }
 
@@ -116,6 +153,7 @@
 @interface ADTickerLabel()
 
 @property (nonatomic, strong) NSMutableArray *characterViewsArray;
+@property (nonatomic, strong) NSArray *charactersArray;
 @property (nonatomic, strong) CAShapeLayer *maskLayer;
 
 @end
@@ -126,7 +164,7 @@
 @synthesize font = _font;
 @synthesize characterWidth = _characterWidth;
 @synthesize textColor = _textColor;
-@synthesize textChangeAnimationDuration = _textChangeAnimationDuration;
+@synthesize changeTextAnimationDuration = _changeTextAnimationDuration;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -138,7 +176,8 @@
         self.font = [UIFont systemFontOfSize: 12.];
         self.textColor = [UIColor blackColor];
         self.characterViewsArray = [NSMutableArray array];
-        self.textChangeAnimationDuration = 1;
+        self.changeTextAnimationDuration = 1.f;
+        self.scrollDirection = ADTickerLabelScrollDirectionUp;
         
         [self addMaskLayer];
     }
@@ -181,11 +220,9 @@
 
 - (void)insertNewTickerCharacterView{
     
-    NSArray *charactersArray = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
-
     CGRect newTextLabelBounds = CGRectZero;
     newTextLabelBounds.origin = CGPointZero;
-    newTextLabelBounds.size = CGSizeMake(self.characterWidth, self.font.lineHeight * [charactersArray count]);
+    newTextLabelBounds.size = CGSizeMake(self.characterWidth, self.font.lineHeight * [self.charactersArray count]);
     UILabel *textLabel = [[UILabel alloc] initWithFrame:newTextLabelBounds];
     textLabel.font = self.font;
     textLabel.textAlignment = UITextAlignmentRight;
@@ -195,11 +232,13 @@
     
     CGRect tickerCharacterViewFrame = self.bounds;
     tickerCharacterViewFrame.size.height = newTextLabelBounds.size.height;
+    tickerCharacterViewFrame.origin.y = (self.scrollDirection == ADTickerLabelScrollDirectionDown) ? -self.font.lineHeight * ([self.charactersArray count] - 1) : 0;
     ADTickerCharacterView *numbericView = [[ADTickerCharacterView alloc] initWithFrame:tickerCharacterViewFrame textLabel: textLabel];
     numbericView.selectedCharacter = @"0";
-    numbericView.selectedCharacterIndex = 0;
-    numbericView.charactersArray = charactersArray;
-    numbericView.textChangeAnimationDuration = self.textChangeAnimationDuration;
+    numbericView.selectedCharacterIndex = [self.charactersArray count] - 1;
+    numbericView.charactersArray = self.charactersArray;
+    numbericView.scrollDirection = self.scrollDirection;
+    numbericView.changeTextAnimationDuration = self.changeTextAnimationDuration;
     
     [self addSubview: numbericView];
     
@@ -226,13 +265,11 @@
 - (void)updateTickerCharacterViewsFrames{
     
     __block float originX = 0;
-    [self.characterViewsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        
-        UIView *numericView = (UIView *)obj;
+    [self.characterViewsArray enumerateObjectsUsingBlock:^(ADTickerCharacterView *numericView, NSUInteger idx, BOOL *stop) {
         
         CGRect numericViewFrame = numericView.frame;
         numericViewFrame.origin.x = originX;
-        numericViewFrame.origin.y = 0;
+        numericViewFrame.origin.y = (self.scrollDirection == ADTickerLabelScrollDirectionDown) ? -self.font.lineHeight * ([self.charactersArray count] - 1) : 0;
         numericViewFrame.size.width = self.characterWidth;
         numericView.frame = numericViewFrame;
         
@@ -269,6 +306,39 @@
 
 #pragma mark Interface
 
+- (void)setScrollDirection:(ADTickerLabelScrollDirection)scrollDirection{
+    
+    if(scrollDirection != _scrollDirection){
+        
+        _scrollDirection = scrollDirection;
+        
+        if(scrollDirection == ADTickerLabelScrollDirectionDown){
+            self.charactersArray = @[@"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0", @"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0"];
+        }
+        else{
+            self.charactersArray = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
+        }
+        
+        [self.characterViewsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            
+            ADTickerCharacterView *numericView = (ADTickerCharacterView *)obj;
+            [numericView setScrollDirection: _scrollDirection];
+        }];
+    }
+}
+
+- (void)setChangeTextAnimationDuration:(float)changeTextAnimationDuration{
+    
+    if(_changeTextAnimationDuration != changeTextAnimationDuration){
+        
+        _changeTextAnimationDuration = changeTextAnimationDuration;
+        
+        [self.characterViewsArray enumerateObjectsUsingBlock:^(ADTickerCharacterView *obj, NSUInteger idx, BOOL *stop) {
+            obj.changeTextAnimationDuration = changeTextAnimationDuration;
+        }];
+    }
+}
+
 - (void)setTextColor:(UIColor *)textColor{
     
     if(![_textColor isEqual: textColor]){
@@ -296,18 +366,6 @@
         _characterWidth = characterWidth;
         
         [self updateUIFrames];
-    }
-}
-
-- (void)setTextChangeAnimationDuration:(float)textChangeAnimationDuration{
-    
-    if(_textChangeAnimationDuration != textChangeAnimationDuration){
-        
-        _textChangeAnimationDuration = textChangeAnimationDuration;
-        
-        [self.characterViewsArray enumerateObjectsUsingBlock:^(ADTickerCharacterView *obj, NSUInteger idx, BOOL *stop) {
-            obj.textChangeAnimationDuration = textChangeAnimationDuration;
-        }];
     }
 }
 
@@ -351,12 +409,12 @@
 }
 
 /*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-}
-*/
+ // Only override drawRect: if you perform custom drawing.
+ // An empty implementation adversely affects performance during animation.
+ - (void)drawRect:(CGRect)rect
+ {
+ // Drawing code
+ }
+ */
 
 @end
