@@ -49,9 +49,4 @@ typedef enum{
  */
 @property (nonatomic, unsafe_unretained) CGSize shadowOffset;
 
-/*
- Default ADTickerLabelScrollDirectionUp
- */
-@property (nonatomic, unsafe_unretained) ADTickerLabelScrollDirection scrollDirection;
-
 @end
