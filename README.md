@@ -43,7 +43,7 @@ Usage
 
 ```objective-c
 /*
- Width and height calculates automatically after you have set the font and characterWidth or if you want ypu can use default values
+ Width and height calculates automatically after you have set the font and characterWidth or if you want you can use default values
 */
 ADTickerLabel *tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(100, 50, 0, 15)]; 
 tickerLabel.font = [UIFont boldSystemFontOfSize: 12];
