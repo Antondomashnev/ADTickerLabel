@@ -31,7 +31,7 @@ Add `pod 'ADTickerLabel'` to your Podfile or `pod 'ADTickerLabel', :head` if you
 Source files
 ------------
 
-Another way to add the ADGraphView to your project is to directly add the source files and resources to your project.
+Another way to add the ADTickerLabel to your project is to directly add the source files and resources to your project.
 
 1. Download the [latest code version](https://github.com/Antondomashnev/ADTickerLabel/downloads) or add the repository as a git submodule to your git-tracked project. 
 2. Open your project in Xcode, than drag and drop ADTickerLabel.h and ADTickerLabel.m files onto your project (use the "Product Navigator view"). Make sure to select Copy items when asked if you extracted the code archive outside of your project. 
