@@ -49,4 +49,9 @@ typedef enum{
  */
 @property (nonatomic, unsafe_unretained) CGSize shadowOffset;
 
+/*
+ Default UITextAlignmentCenter
+ */
+@property (nonatomic, unsafe_unretained) UITextAlignment textAligment;
+
 @end

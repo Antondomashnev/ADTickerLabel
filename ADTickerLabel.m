@@ -85,6 +85,10 @@
     if(self.scrollDirection == ADTickerLabelScrollDirectionUp){
         
         NSInteger selectedCharacterIndex = [selectedCharacter integerValue];
+        if (![selectedCharacter isEqualToString:@"."])
+        {
+            selectedCharacterIndex ++;
+        }
         
         if(selectedCharacterIndex < self.selectedCharacterIndex){
             
@@ -117,6 +121,10 @@
     else{
         
         NSInteger selectedCharacterIndex = [self.charactersArray count] - 1 - [selectedCharacter integerValue];
+        if (![selectedCharacter isEqualToString:@"."])
+        {
+            selectedCharacterIndex --;
+        }
         
         if(selectedCharacterIndex < self.selectedCharacterIndex){
             
@@ -171,6 +179,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         
+        self.frame = frame;
         self.backgroundColor = [UIColor clearColor];
         self.characterWidth = 8.f;
         self.font = [UIFont systemFontOfSize: 12.];
@@ -256,9 +265,27 @@
 
 - (void)updateSELFFrame{
     
+    if ([_characterViewsArray count] == 0)
+    {
+        return;
+    }
+    
     CGRect newViewFrame = self.frame;
     newViewFrame.size.width = [self.characterViewsArray count] * self.characterWidth;
-    newViewFrame.origin.x += self.frame.size.width - newViewFrame.size.width;
+    if (_textAligment == UITextAlignmentLeft)
+    {
+        newViewFrame.origin.x = 0;
+    }
+    else if (_textAligment == UITextAlignmentCenter)
+    {
+        newViewFrame.origin.x = (self.frame.size.width - newViewFrame.size.width) / 2;
+    }
+    else if (_textAligment == UITextAlignmentRight)
+    {
+        newViewFrame.origin.x += self.frame.size.width - newViewFrame.size.width;
+    }
+    
+    newViewFrame.size.width = self.frame.size.width;
     self.frame = newViewFrame;
 }
 
@@ -321,10 +348,10 @@
         _scrollDirection = scrollDirection;
         
         if(scrollDirection == ADTickerLabelScrollDirectionDown){
-            self.charactersArray = @[@"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0", @"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0"];
+            self.charactersArray = @[@"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0", @".", @"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0", @"."];
         }
         else{
-            self.charactersArray = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
+            self.charactersArray = @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
         }
         
         [self.characterViewsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -393,6 +420,11 @@
         
         [self updateUIFrames];
     }
+}
+
+- (void)setTextAligment:(UITextAlignment)textAligment
+{
+    _textAligment = textAligment;
 }
 
 - (void)setText:(NSString *)text{
