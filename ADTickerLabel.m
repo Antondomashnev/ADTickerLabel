@@ -179,6 +179,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         
+        self.frame = frame;
         self.backgroundColor = [UIColor clearColor];
         self.characterWidth = 8.f;
         self.font = [UIFont systemFontOfSize: 12.];
@@ -262,12 +263,36 @@
 
 #pragma mark Frames
 
-- (void)updateSELFFrame{
+- (CGRect)viewFrameOfTextAlignment:(UITextAlignment)textAlignment{
     
     CGRect newViewFrame = self.frame;
-    newViewFrame.size.width = [self.characterViewsArray count] * self.characterWidth;
-    newViewFrame.origin.x += self.frame.size.width - newViewFrame.size.width;
-    self.frame = newViewFrame;
+    float charactersWidth = [self.characterViewsArray count] * self.characterWidth;
+    
+    switch (textAlignment){
+        case UITextAlignmentLeft:
+            newViewFrame.origin.x = 0;
+            break;
+        case UITextAlignmentRight:
+            newViewFrame.origin.x = self.frame.size.width - charactersWidth;
+            break;
+        case UITextAlignmentCenter:
+            newViewFrame.origin.x = (self.frame.size.width - charactersWidth) / 2;
+            break;
+        default:
+            newViewFrame.origin.x = 0;
+            break;
+    }
+    
+    return newViewFrame;
+}
+
+- (void)updateSELFFrame{
+    
+    if ([self.characterViewsArray count] == 0){
+        return;
+    }
+    
+    self.frame = [self viewFrameOfTextAlignment:self.textAlignment];
 }
 
 - (void)updateTickerCharacterViewsFrames{
@@ -442,6 +467,11 @@
         
         [self updateTickerCharacterViewsShadow];
     }
+}
+
+- (void)setTextAlignment:(UITextAlignment)textAlignment
+{
+    _textAlignment = textAlignment;
 }
 
 /*
