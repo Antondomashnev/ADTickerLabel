@@ -86,6 +86,10 @@
         
         NSInteger selectedCharacterIndex = [selectedCharacter integerValue];
         
+        if (![selectedCharacter isEqualToString:@"."]){
+            selectedCharacterIndex++;
+        }
+        
         if(selectedCharacterIndex < self.selectedCharacterIndex){
             
             [self animateToPositionY:[self positionYForCharacterAtIndex: selectedCharacterIndex] withCallback:^{
@@ -117,6 +121,10 @@
     else{
         
         NSInteger selectedCharacterIndex = [self.charactersArray count] - 1 - [selectedCharacter integerValue];
+        
+        if ([selectedCharacter isEqualToString:@"."]){
+            selectedCharacterIndex--;
+        }
         
         if(selectedCharacterIndex < self.selectedCharacterIndex){
             
@@ -171,6 +179,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         
+        self.frame = frame;
         self.backgroundColor = [UIColor clearColor];
         self.characterWidth = 8.f;
         self.font = [UIFont systemFontOfSize: 12.];
@@ -254,12 +263,36 @@
 
 #pragma mark Frames
 
-- (void)updateSELFFrame{
+- (CGRect)viewFrameOfTextAlignment:(UITextAlignment)textAlignment{
     
     CGRect newViewFrame = self.frame;
-    newViewFrame.size.width = [self.characterViewsArray count] * self.characterWidth;
-    newViewFrame.origin.x += self.frame.size.width - newViewFrame.size.width;
-    self.frame = newViewFrame;
+    float charactersWidth = [self.characterViewsArray count] * self.characterWidth;
+    
+    switch (textAlignment){
+        case UITextAlignmentLeft:
+            newViewFrame.origin.x = 0;
+            break;
+        case UITextAlignmentRight:
+            newViewFrame.origin.x = self.frame.size.width - charactersWidth;
+            break;
+        case UITextAlignmentCenter:
+            newViewFrame.origin.x = (self.frame.size.width - charactersWidth) / 2;
+            break;
+        default:
+            newViewFrame.origin.x = 0;
+            break;
+    }
+    
+    return newViewFrame;
+}
+
+- (void)updateSELFFrame{
+    
+    if ([self.characterViewsArray count] == 0){
+        return;
+    }
+    
+    self.frame = [self viewFrameOfTextAlignment:self.textAlignment];
 }
 
 - (void)updateTickerCharacterViewsFrames{
@@ -321,10 +354,10 @@
         _scrollDirection = scrollDirection;
         
         if(scrollDirection == ADTickerLabelScrollDirectionDown){
-            self.charactersArray = @[@"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0", @"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0"];
+            self.charactersArray = @[@"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0", @".", @"9", @"8", @"7", @"6", @"5", @"4", @"3", @"2", @"1", @"0", @"."];
         }
         else{
-            self.charactersArray = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
+            self.charactersArray = @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
         }
         
         [self.characterViewsArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -434,6 +467,11 @@
         
         [self updateTickerCharacterViewsShadow];
     }
+}
+
+- (void)setTextAlignment:(UITextAlignment)textAlignment
+{
+    _textAlignment = textAlignment;
 }
 
 /*
