@@ -28,7 +28,7 @@
     
     UIFont *font = [UIFont boldSystemFontOfSize: 12];
     
-    self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(10, 50, 300, font.lineHeight)];
+    self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(50, 50, 100, font.lineHeight)];
     self.tickerLabel.font = font;
     self.tickerLabel.characterWidth = 8;
     self.tickerLabel.changeTextAnimationDuration = 0.5;

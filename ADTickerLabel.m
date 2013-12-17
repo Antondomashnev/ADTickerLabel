@@ -164,6 +164,8 @@
 @property (nonatomic, strong) NSArray *charactersArray;
 @property (nonatomic, strong) CAShapeLayer *maskLayer;
 
+@property (nonatomic, unsafe_unretained) CGRect initialFrame;
+
 @end
 
 @implementation ADTickerLabel
@@ -180,6 +182,7 @@
     if (self) {
         
         self.frame = frame;
+        self.initialFrame = frame;
         self.backgroundColor = [UIColor clearColor];
         self.characterWidth = 8.f;
         self.font = [UIFont systemFontOfSize: 12.];
@@ -269,17 +272,15 @@
     float charactersWidth = [self.characterViewsArray count] * self.characterWidth;
     
     switch (textAlignment){
-        case UITextAlignmentLeft:
-            newViewFrame.origin.x = 0;
-            break;
         case UITextAlignmentRight:
-            newViewFrame.origin.x = self.frame.size.width - charactersWidth;
+            newViewFrame.origin.x = self.initialFrame.origin.x + self.frame.size.width - charactersWidth;
             break;
         case UITextAlignmentCenter:
-            newViewFrame.origin.x = (self.frame.size.width - charactersWidth) / 2;
+            newViewFrame.origin.x = self.initialFrame.origin.x + (self.frame.size.width - charactersWidth) / 2;
             break;
+        case UITextAlignmentLeft:
         default:
-            newViewFrame.origin.x = 0;
+            newViewFrame.origin.x = self.initialFrame.origin.x;
             break;
     }
     
