@@ -90,7 +90,7 @@
             selectedCharacterIndex++;
         }
         
-        if(selectedCharacterIndex < self.selectedCharacterIndex){
+        if(selectedCharacterIndex <= self.selectedCharacterIndex){
             
             [self animateToPositionY:[self positionYForCharacterAtIndex: selectedCharacterIndex] withCallback:^{
                 self.selectedCharacter = selectedCharacter;
