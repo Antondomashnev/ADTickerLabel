@@ -259,7 +259,8 @@
 
 - (void)deleteCharacterView{
     
-    ADTickerCharacterView *numericView = [self.characterViewsArray objectAtIndex:0];
+    NSUInteger deleteIndex = [self.characterViewsArray count] - 1;
+    ADTickerCharacterView *numericView = [self.characterViewsArray objectAtIndex:deleteIndex];
     [numericView removeFromSuperview];
     [self.characterViewsArray removeObject: numericView];
 }
