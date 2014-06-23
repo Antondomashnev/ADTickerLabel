@@ -176,22 +176,30 @@
 @synthesize textColor = _textColor;
 @synthesize changeTextAnimationDuration = _changeTextAnimationDuration;
 
+-(void)initializeLabel
+{
+   self.initialFrame = self.frame;
+   self.backgroundColor = [UIColor clearColor];
+   self.characterWidth = 8.f;
+   self.font = [UIFont systemFontOfSize: 12.];
+   self.textColor = [UIColor blackColor];
+   self.characterViewsArray = [NSMutableArray array];
+   self.changeTextAnimationDuration = 1.f;
+   self.scrollDirection = ADTickerLabelScrollDirectionUp;
+   
+   [self addMaskLayer];
+}
+
+-(void)awakeFromNib
+{
+   [ self initializeLabel ];
+}
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        
-        self.frame = frame;
-        self.initialFrame = frame;
-        self.backgroundColor = [UIColor clearColor];
-        self.characterWidth = 8.f;
-        self.font = [UIFont systemFontOfSize: 12.];
-        self.textColor = [UIColor blackColor];
-        self.characterViewsArray = [NSMutableArray array];
-        self.changeTextAnimationDuration = 1.f;
-        self.scrollDirection = ADTickerLabelScrollDirectionUp;
-        
-        [self addMaskLayer];
+       [ self initializeLabel ];
     }
     return self;
 }
@@ -237,7 +245,7 @@
     newTextLabelBounds.size = CGSizeMake(self.characterWidth, self.font.lineHeight * [self.charactersArray count]);
     UILabel *textLabel = [[UILabel alloc] initWithFrame:newTextLabelBounds];
     textLabel.font = self.font;
-    textLabel.textAlignment = UITextAlignmentRight;
+    textLabel.textAlignment = NSTextAlignmentRight;
     textLabel.backgroundColor = [UIColor clearColor];
     textLabel.textColor = self.textColor;
     textLabel.numberOfLines = 0;
@@ -273,13 +281,13 @@
     float charactersWidth = [self.characterViewsArray count] * self.characterWidth;
     
     switch (textAlignment){
-        case UITextAlignmentRight:
+        case NSTextAlignmentRight:
             newViewFrame.origin.x = self.initialFrame.origin.x + self.frame.size.width - charactersWidth;
             break;
-        case UITextAlignmentCenter:
+        case NSTextAlignmentCenter:
             newViewFrame.origin.x = self.initialFrame.origin.x + (self.frame.size.width - charactersWidth) / 2;
             break;
-        case UITextAlignmentLeft:
+        case NSTextAlignmentLeft:
         default:
             newViewFrame.origin.x = self.initialFrame.origin.x;
             break;
