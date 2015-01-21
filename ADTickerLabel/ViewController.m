@@ -32,7 +32,7 @@
     self.tickerLabel.font = font;
     self.tickerLabel.characterWidth = 8;
     self.tickerLabel.changeTextAnimationDuration = 0.5;
-    self.tickerLabel.textAlignment = UITextAlignmentCenter;
+    self.tickerLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview: self.tickerLabel];
 }
 
