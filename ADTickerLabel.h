@@ -15,43 +15,34 @@ typedef enum{
 
 @interface ADTickerLabel : UIView
 
-@property (nonatomic, strong) UIFont *font;
-@property (nonatomic, strong) UIColor *textColor;
-
-/*
- Default 8 px
- */
-@property (nonatomic, unsafe_unretained) float characterWidth;
-
-/*
- Frame may have been changed after setting new text
- */
-@property (nonatomic, strong) NSString *text;
-
-/*
- Change text animation duration in seconds
- Default 1 seconds
- */
-@property (nonatomic, unsafe_unretained) float changeTextAnimationDuration;
+@property (nonatomic) UIFont *font;
+@property (nonatomic) UIColor *textColor;
 
 /*
  Default ADTickerLabelScrollDirectionUp
  */
-@property (nonatomic, unsafe_unretained) ADTickerLabelScrollDirection scrollDirection;
+@property (nonatomic) ADTickerLabelScrollDirection scrollDirection;
 
 /*
  Default nil
  */
-@property (nonatomic, strong) UIColor *shadowColor;
+@property (nonatomic) UIColor *shadowColor;
 
 /*
  Default CGSizeMake(0, 0)
  */
-@property (nonatomic, unsafe_unretained) CGSize shadowOffset;
+@property (nonatomic) CGSize shadowOffset;
 
 /*
  Default UITextAlignmentLeft
  */
-@property (nonatomic, unsafe_unretained) UITextAlignment textAlignment;
+@property (nonatomic) UITextAlignment textAlignment;
+
+/*
+ Frame may have been changed after setting new text
+ */
+@property (nonatomic) NSString *text;
+
+-(void)setText:(NSString *)text animated:(BOOL)animated;
 
 @end
