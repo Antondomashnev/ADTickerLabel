@@ -202,12 +202,12 @@
 
 - (void)insertNewCharacterLabel
 {
-   CGRect labelFrame = CGRectZero;
-   labelFrame.origin = CGPointZero;
-   labelFrame.size = CGSizeMake(self.characterWidth, self.font.lineHeight * [self.charactersArray count]);
-   labelFrame.origin.y = (self.scrollDirection == ADTickerLabelScrollDirectionDown) ? -self.font.lineHeight * ([self.charactersArray count] - 1) : 0;
+   CGRect characterFrame = CGRectZero;
+   characterFrame.origin = CGPointZero;
+   characterFrame.size = CGSizeMake(self.characterWidth, self.font.lineHeight * [self.charactersArray count]);
+   characterFrame.origin.y = (self.scrollDirection == ADTickerLabelScrollDirectionDown) ? -self.font.lineHeight * ([self.charactersArray count] - 1) : 0;
 
-   ADTickerCharacterLabel *characterLabel = [[ADTickerCharacterLabel alloc] initWithFrame:labelFrame];
+   ADTickerCharacterLabel *characterLabel = [[ADTickerCharacterLabel alloc] initWithFrame: characterFrame];
    characterLabel.font = self.font;
    characterLabel.textAlignment = NSTextAlignmentRight;
    characterLabel.backgroundColor = [UIColor clearColor];
@@ -329,6 +329,20 @@
    [self setText:text animated:YES];
 }
 
+- (void)layoutCharacterLabels
+{
+   CGRect characterFrame = CGRectZero;
+   for (UIView* characterView in self.characterViewsArray)
+   {
+      characterFrame.size.height = characterView.frame.size.height;
+      characterFrame.origin.y = (self.scrollDirection == ADTickerLabelScrollDirectionDown) ? -self.font.lineHeight * ([self.charactersArray count] - 1) : 0;
+      characterFrame.size.width = self.characterWidth;
+      characterView.frame = characterFrame;
+      
+      characterFrame.origin.x += self.characterWidth;
+   }
+}
+
 - (void)setText:(NSString *)text
        animated:(BOOL)animated
 {
@@ -348,6 +362,8 @@
          [self insertNewCharacterLabel];
       }
       [self invalidateIntrinsicContentSize];
+      [self setNeedsLayout];
+      [self layoutCharacterLabels];
    }
    else if (newTextLength < oldTextLength)
    {
@@ -357,6 +373,8 @@
          [self removeLastCharacterLabel];
       }
       [self invalidateIntrinsicContentSize];
+      [self setNeedsLayout];
+      [self layoutCharacterLabels];
    }
 
    [self.characterViewsArray enumerateObjectsUsingBlock:
@@ -387,9 +405,10 @@
       frame.size.height = self.font.lineHeight;
       frame.origin.y = -(self.font.lineHeight - self.bounds.size.height) / 2.f;
    }
-   
+
    CGFloat charactersWidth = [self.characterViewsArray count] * self.characterWidth;
-   
+   frame.size.width = charactersWidth;
+
    switch (self.textAlignment)
    {
       case NSTextAlignmentRight:
@@ -414,17 +433,6 @@
    if ([self.characterViewsArray count] > 0)
    {
       self.charactersView.frame = [self characterViewFrameWithContentBounds: self.bounds];
-
-      CGRect characterFrame = CGRectZero;
-      for (UIView* characterView in self.characterViewsArray)
-      {
-         characterFrame.size.height = characterView.frame.size.height;
-         characterFrame.origin.y = (self.scrollDirection == ADTickerLabelScrollDirectionDown) ? -self.font.lineHeight * ([self.charactersArray count] - 1) : 0;
-         characterFrame.size.width = self.characterWidth;
-         characterView.frame = characterFrame;
-
-         characterFrame.origin.x += self.characterWidth;
-      }
    }
 }
 

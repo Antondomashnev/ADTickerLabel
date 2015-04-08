@@ -38,9 +38,6 @@ typedef enum{
  */
 @property (nonatomic) UITextAlignment textAlignment;
 
-/*
- Frame may have been changed after setting new text
- */
 @property (nonatomic) NSString *text;
 
 -(void)setText:(NSString *)text animated:(BOOL)animated;
