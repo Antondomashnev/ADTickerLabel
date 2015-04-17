@@ -20,15 +20,12 @@
    if (self = [super initWithFrame: frame])
    {
       self.clipsToBounds = YES;
+      self.lineBreakMode = NSLineBreakByCharWrapping;
+      self.textAlignment = NSTextAlignmentCenter;
+      self.numberOfLines = 0;
       self.backgroundColor = [UIColor clearColor];
    }
    return self;
-}
-
-- (void)setCharactersArray:(NSArray *)characters
-{
-   _charactersArray = characters;
-   self.text = [characters componentsJoinedByString: @"\n"];
 }
 
 - (CGFloat)positionYForCharacterAtIndex:(NSInteger)index
@@ -203,16 +200,24 @@
 - (void)insertNewCharacterLabel
 {
    CGRect characterFrame = CGRectZero;
-   characterFrame.origin = CGPointZero;
-   characterFrame.size = CGSizeMake(self.characterWidth, self.font.lineHeight * [self.charactersArray count]);
-   characterFrame.origin.y = (self.scrollDirection == ADTickerLabelScrollDirectionDown) ? -self.font.lineHeight * ([self.charactersArray count] - 1) : 0;
+
+   NSString *characters = [self.charactersArray componentsJoinedByString: @""];
+   characterFrame.size = [characters boundingRectWithSize:CGSizeMake(self.characterWidth, MAXFLOAT)
+                                                  options:NSStringDrawingUsesLineFragmentOrigin
+                                               attributes:@{NSFontAttributeName: self.font}
+                                                  context:0].size;
+
+   if (self.scrollDirection == ADTickerLabelScrollDirectionDown)
+   {
+      CGFloat characterHeight = characterFrame.size.height / [self.charactersArray count];
+      characterFrame.origin.y = characterHeight - characterFrame.size.height;
+   }
 
    ADTickerCharacterLabel *characterLabel = [[ADTickerCharacterLabel alloc] initWithFrame: characterFrame];
+   characterLabel.text = characters;
+   characterLabel.charactersArray = self.charactersArray;
    characterLabel.font = self.font;
-   characterLabel.textAlignment = NSTextAlignmentRight;
-   characterLabel.backgroundColor = [UIColor clearColor];
    characterLabel.textColor = self.textColor;
-   characterLabel.numberOfLines = 0;
    characterLabel.shadowColor = self.shadowColor;
    characterLabel.shadowOffset = self.shadowOffset;
 
@@ -235,7 +240,8 @@
 
 + (NSArray*)charactersArray
 {
-   return @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
+   return @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"
+            , @".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
 }
 
 - (void)setScrollDirection:(ADTickerLabelScrollDirection)direction
@@ -335,7 +341,11 @@
    for (UIView* characterView in self.characterViewsArray)
    {
       characterFrame.size.height = characterView.frame.size.height;
-      characterFrame.origin.y = (self.scrollDirection == ADTickerLabelScrollDirectionDown) ? -self.font.lineHeight * ([self.charactersArray count] - 1) : 0;
+      if (self.scrollDirection == ADTickerLabelScrollDirectionDown)
+      {
+         CGFloat characterHeight = characterFrame.size.height / [self.charactersArray count];
+         characterFrame.origin.y = characterHeight - characterFrame.size.height;
+      }
       characterFrame.size.width = self.characterWidth;
       characterView.frame = characterFrame;
       
@@ -400,12 +410,6 @@
 
 - (CGRect)characterViewFrameWithContentBounds:(CGRect)frame
 {
-   if (self.font.lineHeight > self.bounds.size.height)
-   {
-      frame.size.height = self.font.lineHeight;
-      frame.origin.y = -(self.font.lineHeight - self.bounds.size.height) / 2.f;
-   }
-
    CGFloat charactersWidth = [self.characterViewsArray count] * self.characterWidth;
    frame.size.width = charactersWidth;
 
