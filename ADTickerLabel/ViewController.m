@@ -26,12 +26,9 @@
     self.currentIndex = 0;
     self.numbersArray = @[@1, @29, @1098.7, @89, @18741984, @897];
     
-    UIFont *font = [UIFont boldSystemFontOfSize: 12];
-    
+    UIFont *font = [UIFont fontWithName: @"HelveticaNeue-Light" size: 20];
     self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(50, 50, 100, font.lineHeight)];
     self.tickerLabel.font = font;
-    self.tickerLabel.characterWidth = 8;
-    self.tickerLabel.changeTextAnimationDuration = 0.5;
     self.tickerLabel.textAlignment = UITextAlignmentCenter;
     [self.view addSubview: self.tickerLabel];
 }
