@@ -5,9 +5,8 @@
 @interface ADTickerCharacterLabel : UILabel
 
 @property (nonatomic) NSArray *charactersArray;
-@property (nonatomic) NSString *selectedCharacter;
 
-@property (nonatomic) float changeTextAnimationDuration;
+@property (nonatomic) NSTimeInterval changeTextAnimationDuration;
 @property (nonatomic) ADTickerLabelScrollDirection scrollDirection;
 @property (nonatomic) NSInteger selectedCharacterIndex;
 
@@ -51,8 +50,7 @@
        }
                        completion:
        ^(BOOL finished)
-      {
-          
+       {
           completion();
        }];
    }
@@ -81,7 +79,6 @@
                      animated: animated
                    completion:
           ^{
-             self.selectedCharacter = selectedCharacter;
              self.selectedCharacterIndex = selectedCharacterIndex;
           }];
       }
@@ -96,7 +93,6 @@
                      animated: animated
                    completion:
           ^{
-             self.selectedCharacter = selectedCharacter;
              self.selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter];
              
              CGRect newFrame = self.frame;
@@ -120,7 +116,6 @@
                      animated: animated
                    completion:
           ^{
-             self.selectedCharacter = selectedCharacter;
              self.selectedCharacterIndex = selectedCharacterIndex;
           }];
       }
@@ -135,7 +130,6 @@
                      animated: animated
                    completion:
           ^{
-             self.selectedCharacter = selectedCharacter;
              self.selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter];
              
              CGRect newFrame = self.frame;
@@ -153,13 +147,18 @@
 @property (nonatomic, readonly) NSArray *characterViewsArray;
 @property (nonatomic) NSArray *charactersArray;
 @property (nonatomic) CGFloat characterWidth;
-@property (nonatomic) float changeTextAnimationDuration;
 
 @property (nonatomic) UIView* charactersView;
 
 @end
 
 @implementation ADTickerLabel
+
++ (NSArray*)charactersArray
+{
+   return @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"
+            , @".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
+}
 
 - (void)initializeLabel
 {
@@ -168,10 +167,10 @@
    self.charactersView.backgroundColor = [UIColor clearColor];
    [self addSubview: self.charactersView];
 
+   self.charactersArray = [[self class] charactersArray];
    self.font = [UIFont systemFontOfSize: 12.];
    self.textColor = [UIColor blackColor];
-   self.changeTextAnimationDuration = 1.f;
-   self.scrollDirection = ADTickerLabelScrollDirectionUp;
+   self.changeTextAnimationDuration = 1.0;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
@@ -221,9 +220,6 @@
    characterLabel.shadowColor = self.shadowColor;
    characterLabel.shadowOffset = self.shadowOffset;
 
-   characterLabel.selectedCharacter = @"0";
-   characterLabel.selectedCharacterIndex = [self.charactersArray count] - 1;
-   characterLabel.charactersArray = self.charactersArray;
    characterLabel.scrollDirection = self.scrollDirection;
    characterLabel.changeTextAnimationDuration = self.changeTextAnimationDuration;
 
@@ -238,12 +234,6 @@
 
 #pragma mark Interface
 
-+ (NSArray*)charactersArray
-{
-   return @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"
-            , @".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
-}
-
 - (void)setScrollDirection:(ADTickerLabelScrollDirection)direction
 {
    if (direction != _scrollDirection)
@@ -251,6 +241,7 @@
       _scrollDirection = direction;
       
       NSArray* charactersArray = [[self class] charactersArray];
+
       if (direction == ADTickerLabelScrollDirectionDown)
       {
          charactersArray = [charactersArray reverseObjectEnumerator].allObjects;
@@ -265,7 +256,7 @@
    }
 }
 
-- (void)setChangeTextAnimationDuration:(float)duration
+- (void)setChangeTextAnimationDuration:(NSTimeInterval)duration
 {
    if (_changeTextAnimationDuration != duration)
    {
@@ -321,9 +312,9 @@
 
       [self.characterViewsArray enumerateObjectsUsingBlock:
        ^(UILabel *label, NSUInteger idx, BOOL *stop)
-      {
-         label.font = self.font;
-      }];
+       {
+          label.font = self.font;
+       }];
 
       [self setNeedsLayout];
       [self invalidateIntrinsicContentSize];
@@ -338,17 +329,18 @@
 - (void)layoutCharacterLabels
 {
    CGRect characterFrame = CGRectZero;
-   for (UIView* characterView in self.characterViewsArray)
+   for (ADTickerCharacterLabel* label in self.characterViewsArray)
    {
-      characterFrame.size.height = characterView.frame.size.height;
+      characterFrame.size.height = label.frame.size.height;
       if (self.scrollDirection == ADTickerLabelScrollDirectionDown)
       {
          CGFloat characterHeight = characterFrame.size.height / [self.charactersArray count];
          characterFrame.origin.y = characterHeight - characterFrame.size.height;
       }
       characterFrame.size.width = self.characterWidth;
-      characterView.frame = characterFrame;
-      
+      label.frame = characterFrame;
+      label.selectedCharacterIndex = 0;
+
       characterFrame.origin.x += self.characterWidth;
    }
 }

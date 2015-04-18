@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 typedef enum{
-    ADTickerLabelScrollDirectionUp = 1,
-    ADTickerLabelScrollDirectionDown = 2
+    ADTickerLabelScrollDirectionUp,
+    ADTickerLabelScrollDirectionDown
 }ADTickerLabelScrollDirection;
 
 @interface ADTickerLabel : UIView
@@ -37,6 +37,11 @@ typedef enum{
  Default UITextAlignmentLeft
  */
 @property (nonatomic) UITextAlignment textAlignment;
+
+/*
+ Default 1.0
+ */
+@property (nonatomic) NSTimeInterval changeTextAnimationDuration;
 
 @property (nonatomic) NSString *text;
 
