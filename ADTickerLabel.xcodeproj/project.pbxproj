@@ -69,7 +69,9 @@
 				6D56CDF1175536770019E045 /* Frameworks */,
 				6D56CDF0175536770019E045 /* Products */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
+			tabWidth = 4;
 		};
 		6D56CDF0175536770019E045 /* Products */ = {
 			isa = PBXGroup;

@@ -109,7 +109,7 @@
    {
       NSInteger selectedCharacterIndex = [self.charactersArray count] - 1 - [selectedCharacter integerValue];
 
-      if ([selectedCharacter isEqualToString: @"."])
+      if (![selectedCharacter isEqualToString: @"."])
       {
          selectedCharacterIndex--;
       }

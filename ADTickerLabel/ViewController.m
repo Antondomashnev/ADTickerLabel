@@ -29,6 +29,7 @@
     UIFont *font = [UIFont fontWithName: @"HelveticaNeue-Light" size: 20];
     self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(50, 50, 100, font.lineHeight)];
     self.tickerLabel.font = font;
+    self.tickerLabel.scrollDirection = ADTickerLabelScrollDirectionDown;
     self.tickerLabel.textAlignment = UITextAlignmentCenter;
     [self.view addSubview: self.tickerLabel];
 }
