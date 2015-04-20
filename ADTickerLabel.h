@@ -15,35 +15,35 @@ typedef enum{
 
 @interface ADTickerLabel : UIView
 
-@property (nonatomic) UIFont *font;
-@property (nonatomic) UIColor *textColor;
+@property (nonatomic, strong) UIFont *font;
+@property (nonatomic, strong) UIColor *textColor;
 
 /*
  Default ADTickerLabelScrollDirectionUp
  */
-@property (nonatomic) ADTickerLabelScrollDirection scrollDirection;
+@property (nonatomic, assign) ADTickerLabelScrollDirection scrollDirection;
 
 /*
  Default nil
  */
-@property (nonatomic) UIColor *shadowColor;
+@property (nonatomic, strong) UIColor *shadowColor;
 
 /*
  Default CGSizeMake(0, 0)
  */
-@property (nonatomic) CGSize shadowOffset;
+@property (nonatomic, assign) CGSize shadowOffset;
 
 /*
  Default UITextAlignmentLeft
  */
-@property (nonatomic) UITextAlignment textAlignment;
+@property (nonatomic, assign) UITextAlignment textAlignment;
 
 /*
  Default 1.0
  */
-@property (nonatomic) NSTimeInterval changeTextAnimationDuration;
+@property (nonatomic, assign) NSTimeInterval changeTextAnimationDuration;
 
-@property (nonatomic) NSString *text;
+@property (nonatomic, copy) NSString *text;
 
 -(void)setText:(NSString *)text animated:(BOOL)animated;
 

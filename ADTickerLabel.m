@@ -4,11 +4,11 @@
 
 @interface ADTickerCharacterLabel : UILabel
 
-@property (nonatomic) NSArray *charactersArray;
+@property (nonatomic, strong) NSArray *charactersArray;
 
-@property (nonatomic) NSTimeInterval changeTextAnimationDuration;
-@property (nonatomic) ADTickerLabelScrollDirection scrollDirection;
-@property (nonatomic) NSInteger selectedCharacterIndex;
+@property (nonatomic, assign) NSTimeInterval changeTextAnimationDuration;
+@property (nonatomic, assign) ADTickerLabelScrollDirection scrollDirection;
+@property (nonatomic, assign) NSInteger selectedCharacterIndex;
 
 @end
 
@@ -73,7 +73,7 @@
          selectedCharacterIndex++;
       }
 
-      if (selectedCharacterIndex <= self.selectedCharacterIndex)
+      if (selectedCharacterIndex < self.selectedCharacterIndex)
       {
          [self moveToPosition: [self positionYForCharacterAtIndex: selectedCharacterIndex]
                      animated: animated
