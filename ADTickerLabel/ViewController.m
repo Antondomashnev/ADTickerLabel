@@ -29,7 +29,7 @@
    UIFont *font = [UIFont fontWithName: @"HelveticaNeue-Light" size: 20];
    self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(50, 50, 100, font.lineHeight)];
    self.tickerLabel.font = font;
-   self.tickerLabel.textAlignment = UITextAlignmentCenter;
+   self.tickerLabel.textAlignment = NSTextAlignmentCenter;
    self.tickerLabel.changeTextAnimationDuration = 0.5;
    [self.view addSubview: self.tickerLabel];
 }
