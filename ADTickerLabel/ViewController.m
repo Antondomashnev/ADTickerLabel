@@ -21,33 +21,31 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-	
-    self.currentIndex = 0;
-    self.numbersArray = @[@1, @29, @1098.7, @89, @18741984, @897];
-    
-    UIFont *font = [UIFont boldSystemFontOfSize: 12];
-    
-    self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(50, 50, 100, font.lineHeight)];
-    self.tickerLabel.font = font;
-    self.tickerLabel.characterWidth = 8;
-    self.tickerLabel.changeTextAnimationDuration = 0.5;
-    self.tickerLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview: self.tickerLabel];
+   [super viewDidLoad];
+
+   self.currentIndex = 0;
+   self.numbersArray = @[@1, @29, @1098.7, @89, @18741984, @897];
+
+   UIFont *font = [UIFont fontWithName: @"HelveticaNeue-Light" size: 20];
+   self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(50, 50, 100, font.lineHeight)];
+   self.tickerLabel.font = font;
+   self.tickerLabel.textAlignment = NSTextAlignmentCenter;
+   self.tickerLabel.changeTextAnimationDuration = 0.5;
+   [self.view addSubview: self.tickerLabel];
 }
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+   [super didReceiveMemoryWarning];
+   // Dispose of any resources that can be recreated.
 }
 
 - (IBAction)buttonClicked:(id)sender{
-    
-    self.tickerLabel.text = [NSString stringWithFormat:@"%@", self.numbersArray[self.currentIndex]];
-    
-    self.currentIndex++;
-    if(self.currentIndex == [self.numbersArray count]) self.currentIndex = 0;
+   
+   self.tickerLabel.text = [NSString stringWithFormat:@"%@", self.numbersArray[self.currentIndex]];
+   
+   self.currentIndex++;
+   if(self.currentIndex == [self.numbersArray count]) self.currentIndex = 0;
 }
 
 @end

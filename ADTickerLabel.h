@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 typedef enum{
-    ADTickerLabelScrollDirectionUp = 1,
-    ADTickerLabelScrollDirectionDown = 2
+    ADTickerLabelScrollDirectionUp,
+    ADTickerLabelScrollDirectionDown
 }ADTickerLabelScrollDirection;
 
 @interface ADTickerLabel : UIView
@@ -19,25 +19,9 @@ typedef enum{
 @property (nonatomic, strong) UIColor *textColor;
 
 /*
- Default 8 px
- */
-@property (nonatomic, unsafe_unretained) float characterWidth;
-
-/*
- Frame may have been changed after setting new text
- */
-@property (nonatomic, strong) NSString *text;
-
-/*
- Change text animation duration in seconds
- Default 1 seconds
- */
-@property (nonatomic, unsafe_unretained) float changeTextAnimationDuration;
-
-/*
  Default ADTickerLabelScrollDirectionUp
  */
-@property (nonatomic, unsafe_unretained) ADTickerLabelScrollDirection scrollDirection;
+@property (nonatomic, assign) ADTickerLabelScrollDirection scrollDirection;
 
 /*
  Default nil
@@ -47,11 +31,20 @@ typedef enum{
 /*
  Default CGSizeMake(0, 0)
  */
-@property (nonatomic, unsafe_unretained) CGSize shadowOffset;
+@property (nonatomic, assign) CGSize shadowOffset;
 
 /*
  Default UITextAlignmentLeft
  */
-@property (nonatomic, unsafe_unretained) UITextAlignment textAlignment;
+@property (nonatomic, assign) UITextAlignment textAlignment;
+
+/*
+ Default 1.0
+ */
+@property (nonatomic, assign) NSTimeInterval changeTextAnimationDuration;
+
+@property (nonatomic, copy) NSString *text;
+
+-(void)setText:(NSString *)text animated:(BOOL)animated;
 
 @end

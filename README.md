@@ -47,7 +47,6 @@ Usage
 */
 ADTickerLabel *tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(100, 50, 0, 15)];
 tickerLabel.font = [UIFont boldSystemFontOfSize: 12];
-tickerLabel.characterWidth = 8;
 tickerLabel.textColor = [UIColor whiteColor];
 [self addSubview: tickerLabel];
 
