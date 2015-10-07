@@ -4,7 +4,7 @@
 
 @interface ADTickerCharacterLabel : UILabel
 
-@property (nonatomic, strong) NSArray *charactersArray;
+@property (nonatomic, strong) NSArray <NSString *>*charactersArray;
 
 @property (nonatomic, assign) NSTimeInterval changeTextAnimationDuration;
 @property (nonatomic, assign) ADTickerLabelScrollDirection scrollDirection;
@@ -23,6 +23,7 @@
       self.textAlignment = NSTextAlignmentCenter;
       self.numberOfLines = 0;
       self.backgroundColor = [UIColor clearColor];
+      self.selectedCharacterIndex = -1;
    }
    return self;
 }
@@ -43,16 +44,15 @@
 
    if (animated)
    {
-      [UIView animateWithDuration: self.changeTextAnimationDuration
-                       animations:
-       ^{
-          self.frame = newFrame;
-       }
-                       completion:
-       ^(BOOL finished)
-       {
-          completion();
-       }];
+      [UIView animateWithDuration:self.changeTextAnimationDuration
+                            delay:0.0
+                          options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction
+                       animations:^{
+                          self.frame = newFrame;
+                       }
+                       completion:^(BOOL finished) {
+                          completion();
+                       }];
    }
    else
    {
@@ -103,35 +103,54 @@
    }
    else
    {
-      NSInteger selectedCharacterIndex = [self.charactersArray count] - 1 - [selectedCharacter integerValue];
+      NSIndexSet *rangesOfCharacter = [self.charactersArray indexesOfObjectsPassingTest:^BOOL(NSString * _Nonnull string, NSUInteger idx, BOOL * _Nonnull stop) {
+         return [string isEqualToString:selectedCharacter];
+      }];
+      
+      __block NSInteger selectedCharacterIndex = -1;
+      __block NSInteger characterDistance = NSIntegerMax;
+      [rangesOfCharacter enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+         NSInteger distance = ABS(self.selectedCharacterIndex - (NSInteger)idx);
+         if (distance < characterDistance)
+         {
+            characterDistance = distance;
+            selectedCharacterIndex = idx;
+         }
+      }];
 
-      if (![selectedCharacter isEqualToString: @"."])
-      {
-         selectedCharacterIndex--;
-      }
-
+      //We try to find the character near the middle
+      __block NSInteger selectedCharacterIndexAfterAnimation = -1;
+      characterDistance = NSIntegerMax;
+      NSInteger middle = self.charactersArray.count * 0.5;
+      [rangesOfCharacter enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+         NSInteger distance = ABS(middle - (NSInteger)idx);
+         if (distance < characterDistance)
+         {
+            characterDistance = distance;
+            selectedCharacterIndexAfterAnimation = idx;
+         }
+      }];
+      
       if (selectedCharacterIndex < self.selectedCharacterIndex)
       {
+         self.selectedCharacterIndex = selectedCharacterIndexAfterAnimation;
+         
          [self moveToPosition: [self positionYForCharacterAtIndex: selectedCharacterIndex]
                      animated: animated
                    completion:
           ^{
-             self.selectedCharacterIndex = selectedCharacterIndex;
+             CGRect newFrame = self.frame;
+             newFrame.origin.y = [self positionYForCharacterAtIndex: self.selectedCharacterIndex];
+             self.frame = newFrame;
           }];
       }
       else if(selectedCharacterIndex > self.selectedCharacterIndex){
+         self.selectedCharacterIndex = selectedCharacterIndexAfterAnimation;
          
-         //We try to find the character in second part of array
-         NSUInteger searchLocation = [self.charactersArray count] / 2;
-         selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter
-                                                              inRange: NSMakeRange(searchLocation, [self.charactersArray count] - searchLocation)];
-
          [self moveToPosition: [self positionYForCharacterAtIndex: selectedCharacterIndex]
                      animated: animated
                    completion:
           ^{
-             self.selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter];
-             
              CGRect newFrame = self.frame;
              newFrame.origin.y = [self positionYForCharacterAtIndex: self.selectedCharacterIndex];
              self.frame = newFrame;
@@ -156,8 +175,7 @@
 
 + (NSArray*)charactersArray
 {
-   return @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"
-            , @".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
+   return @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
 }
 
 - (void)initializeLabel
@@ -339,7 +357,7 @@
       }
       characterFrame.size.width = self.characterWidth;
       label.frame = characterFrame;
-      label.selectedCharacterIndex = 0;
+      label.selectedCharacterIndex = -1;
 
       characterFrame.origin.x += self.characterWidth;
    }
@@ -389,7 +407,7 @@
    _text = text;
 }
 
-- (void)setTextAlignment:(UITextAlignment)textAlignment
+- (void)setTextAlignment:(NSTextAlignment)textAlignment
 {
    _textAlignment = textAlignment;
    [self setNeedsLayout];
