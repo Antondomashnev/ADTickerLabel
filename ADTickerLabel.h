@@ -36,7 +36,7 @@ typedef enum{
 /*
  Default UITextAlignmentLeft
  */
-@property (nonatomic, assign) UITextAlignment textAlignment;
+@property (nonatomic, assign) NSTextAlignment textAlignment;
 
 /*
  Default 1.0
