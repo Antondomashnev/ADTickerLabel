@@ -24,7 +24,7 @@
    [super viewDidLoad];
 
    self.currentIndex = 0;
-   self.numbersArray = @[@1, @29, @30, @31, @30, @33];
+   self.numbersArray = @[@1, @29, @1098.7, @89, @18741984, @897];
 
    UIFont *font = [UIFont fontWithName: @"HelveticaNeue-Light" size: 20];
    self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(50, 50, 100, font.lineHeight)];
@@ -36,21 +36,18 @@
    [self.view addSubview: self.tickerLabel];
 }
 
-- (void)didReceiveMemoryWarning
-{
-   [super didReceiveMemoryWarning];
-   // Dispose of any resources that can be recreated.
-}
-
 - (IBAction)buttonClicked:(id)sender{
-   
    self.tickerLabel.text = [NSString stringWithFormat:@"%d", self.tickerLabel.text.intValue+1];
-   
-   self.currentIndex++;
-   if(self.currentIndex == [self.numbersArray count]) self.currentIndex = 0;
 }
 - (IBAction)decrementButtonClicked:(id)sender {
    self.tickerLabel.text = [NSString stringWithFormat:@"%d", self.tickerLabel.text.intValue-1];
+}
+
+- (IBAction)randomButtonClicked:(id)sender {
+   self.tickerLabel.text = [NSString stringWithFormat:@"%@", self.numbersArray[self.currentIndex]];
+   
+   self.currentIndex++;
+   if(self.currentIndex == [self.numbersArray count]) self.currentIndex = 0;
 }
 
 @end
