@@ -1,191 +1,52 @@
 #import "ADTickerLabel.h"
-
 #import <QuartzCore/QuartzCore.h>
+
 
 @interface ADTickerCharacterLabel : UILabel
 
-@property (nonatomic, strong) NSArray <NSString *>*charactersArray;
-
-@property (nonatomic, assign) NSTimeInterval changeTextAnimationDuration;
-@property (nonatomic, assign) ADTickerLabelScrollDirection scrollDirection;
-@property (nonatomic, assign) NSInteger selectedCharacterIndex;
+@property (nonatomic, copy) void(^animationDidCompleteBlock)(ADTickerCharacterLabel *label);
 
 @end
 
 @implementation ADTickerCharacterLabel
 
-- (id)initWithFrame:(CGRect)frame
+-(void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
-   if (self = [super initWithFrame: frame])
+   if (self.animationDidCompleteBlock)
    {
-      self.clipsToBounds = YES;
-      self.lineBreakMode = NSLineBreakByCharWrapping;
-      self.textAlignment = NSTextAlignmentCenter;
-      self.numberOfLines = 0;
-      self.backgroundColor = [UIColor clearColor];
-      self.selectedCharacterIndex = -1;
-   }
-   return self;
-}
-
-- (CGFloat)positionYForCharacterAtIndex:(NSInteger)index
-{
-   CGFloat characterHeight = self.frame.size.height / [self.charactersArray count];
-   CGFloat position = -index * characterHeight;
-   return position;
-}
-
-- (void)moveToPosition:(CGFloat)positionY
-              animated:(BOOL)animated
-            completion:(void(^)(void))completion
-{
-   CGRect newFrame = self.frame;
-   newFrame.origin.y = positionY;
-
-   if (animated)
-   {
-      [UIView animateWithDuration:self.changeTextAnimationDuration
-                            delay:0.0
-                          options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction
-                       animations:^{
-                          self.frame = newFrame;
-                       }
-                       completion:^(BOOL finished) {
-                          completion();
-                       }];
-   }
-   else
-   {
-      self.frame = newFrame;
-      completion();
-   }
-}
-
-- (void)selectCharacter:(NSString *)selectedCharacter
-               animated:(BOOL)animated
-{
-   if (self.scrollDirection == ADTickerLabelScrollDirectionUp)
-   {
-      NSInteger selectedCharacterIndex = [selectedCharacter integerValue];
-      
-      if (![selectedCharacter isEqualToString: @"."])
-      {
-         selectedCharacterIndex++;
-      }
-
-      if (selectedCharacterIndex < self.selectedCharacterIndex)
-      {
-         [self moveToPosition: [self positionYForCharacterAtIndex: selectedCharacterIndex]
-                     animated: animated
-                   completion:
-          ^{
-             self.selectedCharacterIndex = selectedCharacterIndex;
-          }];
-      }
-      else if(selectedCharacterIndex > self.selectedCharacterIndex)
-      {
-         //We try to find the character in second part of array
-         NSUInteger searchLocation = [self.charactersArray count] / 2;
-         selectedCharacterIndex = [ self.charactersArray indexOfObject: selectedCharacter
-                                                               inRange: NSMakeRange(searchLocation, [self.charactersArray count] - searchLocation)];
-
-         [self moveToPosition: [self positionYForCharacterAtIndex: selectedCharacterIndex]
-                     animated: animated
-                   completion:
-          ^{
-             self.selectedCharacterIndex = [self.charactersArray indexOfObject: selectedCharacter];
-             
-             CGRect newFrame = self.frame;
-             newFrame.origin.y = [self positionYForCharacterAtIndex: self.selectedCharacterIndex];
-             self.frame = newFrame;
-          }];
-      }
-   }
-   else
-   {
-      NSIndexSet *rangesOfCharacter = [self.charactersArray indexesOfObjectsPassingTest:^BOOL(NSString * _Nonnull string, NSUInteger idx, BOOL * _Nonnull stop) {
-         return [string isEqualToString:selectedCharacter];
-      }];
-      
-      __block NSInteger selectedCharacterIndex = -1;
-      __block NSInteger characterDistance = NSIntegerMax;
-      [rangesOfCharacter enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-         NSInteger distance = ABS(self.selectedCharacterIndex - (NSInteger)idx);
-         if (distance < characterDistance)
-         {
-            characterDistance = distance;
-            selectedCharacterIndex = idx;
-         }
-      }];
-
-      //We try to find the character near the middle
-      __block NSInteger selectedCharacterIndexAfterAnimation = -1;
-      characterDistance = NSIntegerMax;
-      NSInteger middle = self.charactersArray.count * 0.5;
-      [rangesOfCharacter enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-         NSInteger distance = ABS(middle - (NSInteger)idx);
-         if (distance < characterDistance)
-         {
-            characterDistance = distance;
-            selectedCharacterIndexAfterAnimation = idx;
-         }
-      }];
-      
-      if (selectedCharacterIndex < self.selectedCharacterIndex)
-      {
-         self.selectedCharacterIndex = selectedCharacterIndexAfterAnimation;
-         
-         [self moveToPosition: [self positionYForCharacterAtIndex: selectedCharacterIndex]
-                     animated: animated
-                   completion:
-          ^{
-             CGRect newFrame = self.frame;
-             newFrame.origin.y = [self positionYForCharacterAtIndex: self.selectedCharacterIndex];
-             self.frame = newFrame;
-          }];
-      }
-      else if(selectedCharacterIndex > self.selectedCharacterIndex){
-         self.selectedCharacterIndex = selectedCharacterIndexAfterAnimation;
-         
-         [self moveToPosition: [self positionYForCharacterAtIndex: selectedCharacterIndex]
-                     animated: animated
-                   completion:
-          ^{
-             CGRect newFrame = self.frame;
-             newFrame.origin.y = [self positionYForCharacterAtIndex: self.selectedCharacterIndex];
-             self.frame = newFrame;
-          }];
-      }
+      self.animationDidCompleteBlock(self);
    }
 }
 
 @end
 
+
+
 @interface ADTickerLabel ()
 
-@property (nonatomic, readonly) NSArray *characterViewsArray;
-@property (nonatomic) NSArray *charactersArray;
+@property (nonatomic, strong) NSMutableArray <ADTickerCharacterLabel *> *characterViews;
 @property (nonatomic) CGFloat characterWidth;
 
-@property (nonatomic) UIView* charactersView;
+@property (nonatomic, strong) UIView *charactersView;
+
+@property (nonatomic, strong) NSMutableSet <ADTickerCharacterLabel *> *labelViewsToRemove;
 
 @end
 
 @implementation ADTickerLabel
 
-+ (NSArray*)charactersArray
-{
-   return @[@".", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
-}
+#pragma mark - Initialization
 
 - (void)initializeLabel
 {
+   self.characterViews = [NSMutableArray array];
+   self.labelViewsToRemove = [NSMutableSet set];
+   
    self.charactersView = [[UIView alloc] initWithFrame: self.bounds];
    self.charactersView.clipsToBounds = YES;
    self.charactersView.backgroundColor = [UIColor clearColor];
    [self addSubview: self.charactersView];
 
-   self.charactersArray = [[self class] charactersArray];
    self.font = [UIFont systemFontOfSize: 12.];
    self.textColor = [UIColor blackColor];
    self.changeTextAnimationDuration = 1.0;
@@ -209,158 +70,12 @@
    return self;
 }
 
-- (NSArray*)characterViewsArray
-{
-   return self.charactersView.subviews;
-}
 
-- (void)insertNewCharacterLabel
-{
-   CGRect characterFrame = CGRectZero;
-
-   NSString *characters = [self.charactersArray componentsJoinedByString: @""];
-   characterFrame.size = [characters boundingRectWithSize:CGSizeMake(self.characterWidth, MAXFLOAT)
-                                                  options:NSStringDrawingUsesLineFragmentOrigin
-                                               attributes:@{NSFontAttributeName: self.font}
-                                                  context:0].size;
-
-   if (self.scrollDirection == ADTickerLabelScrollDirectionDown)
-   {
-      CGFloat characterHeight = characterFrame.size.height / [self.charactersArray count];
-      characterFrame.origin.y = characterHeight - characterFrame.size.height;
-   }
-
-   ADTickerCharacterLabel *characterLabel = [[ADTickerCharacterLabel alloc] initWithFrame: characterFrame];
-   characterLabel.text = characters;
-   characterLabel.charactersArray = self.charactersArray;
-   characterLabel.font = self.font;
-   characterLabel.textColor = self.textColor;
-   characterLabel.shadowColor = self.shadowColor;
-   characterLabel.shadowOffset = self.shadowOffset;
-
-   characterLabel.scrollDirection = self.scrollDirection;
-   characterLabel.changeTextAnimationDuration = self.changeTextAnimationDuration;
-
-   [self.charactersView addSubview: characterLabel];
-}
-
-- (void)removeLastCharacterLabel
-{
-   ADTickerCharacterLabel *numericView = [self.characterViewsArray lastObject];
-   [numericView removeFromSuperview];
-}
-
-#pragma mark Interface
-
-- (void)setScrollDirection:(ADTickerLabelScrollDirection)direction
-{
-   if (direction != _scrollDirection)
-   {
-      _scrollDirection = direction;
-      
-      NSArray* charactersArray = [[self class] charactersArray];
-
-      if (direction == ADTickerLabelScrollDirectionDown)
-      {
-         charactersArray = [charactersArray reverseObjectEnumerator].allObjects;
-      }
-      self.charactersArray = charactersArray;
-
-      [self.characterViewsArray enumerateObjectsUsingBlock:
-       ^(ADTickerCharacterLabel* label, NSUInteger idx, BOOL *stop)
-       {
-          [label setScrollDirection: direction];
-       }];
-   }
-}
-
-- (void)setChangeTextAnimationDuration:(NSTimeInterval)duration
-{
-   if (_changeTextAnimationDuration != duration)
-   {
-      _changeTextAnimationDuration = duration;
-
-      [self.characterViewsArray enumerateObjectsUsingBlock:
-       ^(ADTickerCharacterLabel *label, NSUInteger idx, BOOL *stop)
-       {
-          label.changeTextAnimationDuration = duration;
-       }];
-   }
-}
-
-- (void)setShadowOffset:(CGSize)shadowOffset
-{
-   _shadowOffset = shadowOffset;
-   [self.characterViewsArray enumerateObjectsUsingBlock:
-    ^(UILabel *label, NSUInteger idx, BOOL *stop)
-    {
-       label.shadowOffset = shadowOffset;
-    }];
-}
-
-- (void)setShadowColor:(UIColor *)shadowColor
-{
-   _shadowColor = shadowColor;
-   [self.characterViewsArray enumerateObjectsUsingBlock:
-    ^(UILabel *label, NSUInteger idx, BOOL *stop)
-    {
-       label.shadowColor = shadowColor;
-    }];
-}
-
-- (void)setTextColor:(UIColor *)textColor
-{
-   if (![_textColor isEqual: textColor])
-   {
-      _textColor = textColor;
-      [self.characterViewsArray enumerateObjectsUsingBlock:
-       ^(UILabel *label, NSUInteger idx, BOOL *stop)
-       {
-          label.textColor = textColor;
-       }];
-   }
-}
-
-- (void)setFont:(UIFont *)font
-{
-   if (![_font isEqual: font])
-   {
-      _font = font;
-      self.characterWidth = [@"8" sizeWithAttributes:@{NSFontAttributeName: font}].width;
-
-      [self.characterViewsArray enumerateObjectsUsingBlock:
-       ^(UILabel *label, NSUInteger idx, BOOL *stop)
-       {
-          label.font = self.font;
-       }];
-
-      [self setNeedsLayout];
-      [self invalidateIntrinsicContentSize];
-   }
-}
+#pragma mark - Text Update
 
 - (void)setText:(NSString *)text
 {
    [self setText:text animated:YES];
-}
-
-- (void)layoutCharacterLabels
-{
-   CGRect characterFrame = CGRectZero;
-   for (ADTickerCharacterLabel* label in self.characterViewsArray)
-   {
-      characterFrame.size.height = label.frame.size.height;
-      if (self.scrollDirection == ADTickerLabelScrollDirectionDown)
-      {
-         CGFloat characterHeight = characterFrame.size.height / [self.charactersArray count];
-         characterFrame.origin.y = characterHeight - characterFrame.size.height;
-      }
-      characterFrame.size.width = self.characterWidth;
-      label.frame = characterFrame;
-      label.selectedCharacterIndex = -1;
-
-      characterFrame.origin.x += self.characterWidth;
-   }
 }
 
 - (void)setText:(NSString *)text
@@ -370,10 +85,10 @@
    {
       return;
    }
-
+   
    NSInteger oldTextLength = [_text length];
    NSInteger newTextLength = [text length];
-
+   
    if (newTextLength > oldTextLength)
    {
       NSInteger textLengthDelta = newTextLength - oldTextLength;
@@ -390,37 +105,165 @@
       NSInteger textLengthDelta = oldTextLength - newTextLength;
       for (NSInteger i = 0 ; i < textLengthDelta; ++i)
       {
-         [self removeLastCharacterLabel];
+         [self removeLastCharacterLabel:animated];
       }
-      [self invalidateIntrinsicContentSize];
-      [self setNeedsLayout];
-      [self layoutCharacterLabels];
+      
+      if (!animated)
+      {
+         [self invalidateIntrinsicContentSize];
+         [self setNeedsLayout];
+         [self layoutCharacterLabels];
+      }
    }
-
-   [self.characterViewsArray enumerateObjectsUsingBlock:
-    ^(ADTickerCharacterLabel *label, NSUInteger idx, BOOL *stop)
+   
+   [self.characterViews enumerateObjectsUsingBlock:
+    ^(UILabel *label, NSUInteger idx, BOOL *stop)
     {
-       [label selectCharacter: [text substringWithRange:NSMakeRange(idx, 1)]
-                     animated: animated];
+       NSString *character = [text substringWithRange:NSMakeRange(idx, 1)];
+       NSString *oldCharacter = label.text;
+       
+       label.text = character;
+       
+       if (animated && ![oldCharacter isEqualToString:character])
+       {
+          // add basic animation to view
+          NSInteger oldValue = oldCharacter.integerValue;
+          NSInteger newValue = character.integerValue;
+          
+          // jump from 9 to 0 should be animated in the correct direction
+          if (oldValue == 9 && newValue != 8)
+          {
+             [self addLabelAnimation:label direction:ADTickerLabelScrollDirectionDown];
+          }
+          // jump from 0/1 to 9 should be animated in the correct direction
+          else if ((oldValue == 0 || oldValue == 1) && newValue == 9)
+          {
+             [self addLabelAnimation:label direction:ADTickerLabelScrollDirectionUp];
+          }
+          else if (oldValue > newValue)
+          {
+             [self addLabelAnimation:label direction:ADTickerLabelScrollDirectionUp];
+          }
+          else if (oldValue < newValue)
+          {
+             [self addLabelAnimation:label direction:ADTickerLabelScrollDirectionDown];
+          }
+          else
+          {
+             [self addLabelAnimation:label direction:ADTickerLabelScrollDirectionDown];
+          }
+       }
     }];
-
+   
    _text = text;
 }
 
-- (void)setTextAlignment:(NSTextAlignment)textAlignment
+#pragma mark - Character Animation
+
+- (void)addLabelAnimation:(UILabel *)label direction:(ADTickerLabelScrollDirection)scrollDirection
 {
-   _textAlignment = textAlignment;
-   [self setNeedsLayout];
+   [self addLabelAnimation:label direction:scrollDirection notifyDelegate:NO];
 }
 
-- (CGSize)intrinsicContentSize
+- (CATransition *)addLabelAnimation:(UILabel *)label direction:(ADTickerLabelScrollDirection)scrollDirection notifyDelegate:(BOOL)notifyDelegate
 {
-   return CGSizeMake(self.characterWidth * self.text.length, UIViewNoIntrinsicMetric);
+   // inverse the scrolldirection, if the direction is going up
+   if (self.scrollDirection == ADTickerLabelScrollDirectionUp)
+   {
+      scrollDirection = !scrollDirection;
+   }
+   
+   CATransition *transition = [CATransition animation];
+   
+   transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+   transition.duration = self.changeTextAnimationDuration;
+   transition.type = kCATransitionPush;
+   
+   transition.subtype = scrollDirection == ADTickerLabelScrollDirectionUp ? kCATransitionFromTop : kCATransitionFromBottom;
+   
+   if (notifyDelegate)
+   {
+      transition.delegate = label;
+   }
+   
+   [label.layer addAnimation:transition forKey:nil];
+   
+   return transition;
+}
+
+#pragma mark - Character Labels
+
+- (void)insertNewCharacterLabel
+{
+   CGRect characterFrame = CGRectZero;
+   
+   characterFrame.size = CGSizeMake(self.characterWidth, self.bounds.size.height);
+   
+   ADTickerCharacterLabel *characterLabel = [[ADTickerCharacterLabel alloc] initWithFrame: characterFrame];
+   characterLabel.textAlignment = NSTextAlignmentCenter;
+   characterLabel.font = self.font;
+   characterLabel.textColor = self.textColor;
+   characterLabel.shadowColor = self.shadowColor;
+   characterLabel.shadowOffset = self.shadowOffset;
+   
+   [self.charactersView addSubview:characterLabel];
+   
+   [self.characterViews addObject:characterLabel];
+}
+
+- (void)removeLastCharacterLabel:(BOOL)animated
+{
+   ADTickerCharacterLabel *label = self.characterViews.lastObject;
+   [self.characterViews removeObject:label];
+   
+   if (animated)
+   {
+      label.text = nil;
+      
+      [self.labelViewsToRemove addObject:label];
+      
+      __weak typeof(self) weakSelf = self;
+      [label setAnimationDidCompleteBlock:^(ADTickerCharacterLabel *label) {
+         [weakSelf labelDidCompleteRemovealAnimation:label];
+      }];
+      
+      [self addLabelAnimation:label direction:ADTickerLabelScrollDirectionUp notifyDelegate:YES];
+   }
+   else
+   {
+      [label removeFromSuperview];
+   }
+}
+
+-(void)labelDidCompleteRemovealAnimation:(ADTickerCharacterLabel *)label
+{
+   [label removeFromSuperview];
+   [self.labelViewsToRemove removeObject:label];
+   
+   if (self.labelViewsToRemove.count == 0)
+   {
+      [self layoutCharacterLabels];
+      [self invalidateIntrinsicContentSize];
+      [self setNeedsLayout];
+   }
+}
+
+
+#pragma mark - Layouting
+
+- (void)layoutSubviews
+{
+   [super layoutSubviews];
+   
+   if ([self.characterViews count] > 0)
+   {
+      self.charactersView.frame = [self characterViewFrameWithContentBounds: self.bounds];
+   }
 }
 
 - (CGRect)characterViewFrameWithContentBounds:(CGRect)frame
 {
-   CGFloat charactersWidth = [self.characterViewsArray count] * self.characterWidth;
+   CGFloat charactersWidth = [self.characterViews count] * self.characterWidth;
    frame.size.width = charactersWidth;
 
    switch (self.textAlignment)
@@ -440,14 +283,82 @@
    return frame;
 }
 
-- (void)layoutSubviews
+- (void)layoutCharacterLabels
 {
-   [super layoutSubviews];
-
-   if ([self.characterViewsArray count] > 0)
+   CGRect characterFrame = CGRectZero;
+   for (UILabel* label in self.characterViews)
    {
-      self.charactersView.frame = [self characterViewFrameWithContentBounds: self.bounds];
+      characterFrame.size.height = CGRectGetHeight(self.charactersView.bounds);
+      characterFrame.size.width = self.characterWidth;
+      label.frame = characterFrame;
+      
+      characterFrame.origin.x += self.characterWidth;
    }
+}
+
+- (CGSize)intrinsicContentSize
+{
+   return CGSizeMake(self.characterWidth * self.text.length, UIViewNoIntrinsicMetric);
+}
+
+
+#pragma mark - Text Appearance
+
+- (void)setShadowOffset:(CGSize)shadowOffset
+{
+   _shadowOffset = shadowOffset;
+   [self.characterViews enumerateObjectsUsingBlock:
+    ^(UILabel *label, NSUInteger idx, BOOL *stop)
+    {
+       label.shadowOffset = shadowOffset;
+    }];
+}
+
+- (void)setShadowColor:(UIColor *)shadowColor
+{
+   _shadowColor = shadowColor;
+   [self.characterViews enumerateObjectsUsingBlock:
+    ^(UILabel *label, NSUInteger idx, BOOL *stop)
+    {
+       label.shadowColor = shadowColor;
+    }];
+}
+
+- (void)setTextColor:(UIColor *)textColor
+{
+   if (![_textColor isEqual: textColor])
+   {
+      _textColor = textColor;
+      [self.characterViews enumerateObjectsUsingBlock:
+       ^(UILabel *label, NSUInteger idx, BOOL *stop)
+       {
+          label.textColor = textColor;
+       }];
+   }
+}
+
+- (void)setFont:(UIFont *)font
+{
+   if (![_font isEqual: font])
+   {
+      _font = font;
+      self.characterWidth = [@"8" sizeWithAttributes:@{NSFontAttributeName: font}].width;
+      
+      [self.characterViews enumerateObjectsUsingBlock:
+       ^(UILabel *label, NSUInteger idx, BOOL *stop)
+       {
+          label.font = self.font;
+       }];
+      
+      [self setNeedsLayout];
+      [self invalidateIntrinsicContentSize];
+   }
+}
+
+- (void)setTextAlignment:(NSTextAlignment)textAlignment
+{
+   _textAlignment = textAlignment;
+   [self setNeedsLayout];
 }
 
 @end
