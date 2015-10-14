@@ -200,6 +200,7 @@
    characterFrame.size = CGSizeMake(self.characterWidth, self.bounds.size.height);
    
    ADTickerCharacterLabel *characterLabel = [[ADTickerCharacterLabel alloc] initWithFrame: characterFrame];
+   characterLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleRightMargin;
    characterLabel.textAlignment = NSTextAlignmentCenter;
    characterLabel.font = self.font;
    characterLabel.textColor = self.textColor;
@@ -213,7 +214,17 @@
 
 - (void)removeLastCharacterLabel:(BOOL)animated
 {
-   ADTickerCharacterLabel *label = self.characterViews.lastObject;
+   ADTickerCharacterLabel *label = nil;
+   
+   if (self.textAlignment == NSTextAlignmentRight)
+   {
+      label = self.characterViews.firstObject;
+   }
+   else
+   {
+      label = self.characterViews.lastObject;
+   }
+   
    [self.characterViews removeObject:label];
    
    if (animated)
