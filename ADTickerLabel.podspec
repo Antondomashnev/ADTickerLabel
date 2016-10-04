@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/Antondomashnev"
   s.author       = { 'Anton Domashnev' => 'antondomashnev@gmail.com' }
   s.source       = { :git => "https://github.com/Antondomashnev/ADTickerLabel.git", :tag => s.version.to_s}
-  s.platform     = :ios
+  s.platform     = :ios, '8.0'
   s.source_files = '*.{h,m}'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.framework    = 'CoreGraphics', 'QuartzCore'
