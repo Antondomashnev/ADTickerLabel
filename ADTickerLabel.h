@@ -16,7 +16,7 @@ typedef enum{
 @interface ADTickerLabel : UIView
 
 @property (nonatomic, strong) UIFont *font;
-@property (nonatomic, strong) UIColor *textColor;
+@property (nonatomic, strong) IBInspectable UIColor *textColor;
 
 /*
  Default ADTickerLabelScrollDirectionUp
@@ -26,12 +26,12 @@ typedef enum{
 /*
  Default nil
  */
-@property (nonatomic, strong) UIColor *shadowColor;
+@property (nonatomic, strong) IBInspectable UIColor *shadowColor;
 
 /*
  Default CGSizeMake(0, 0)
  */
-@property (nonatomic, assign) CGSize shadowOffset;
+@property (nonatomic, assign) IBInspectable CGSize shadowOffset;
 
 /*
  Default UITextAlignmentLeft
@@ -41,9 +41,9 @@ typedef enum{
 /*
  Default 1.0
  */
-@property (nonatomic, assign) NSTimeInterval changeTextAnimationDuration;
+@property (nonatomic, assign) IBInspectable CGFloat animationDuration;
 
-@property (nonatomic, copy) NSString *text;
+@property (nonatomic, copy) IBInspectable NSString *text;
 
 -(void)setText:(NSString *)text animated:(BOOL)animated;
 

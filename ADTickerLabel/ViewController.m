@@ -30,7 +30,7 @@
    self.tickerLabel = [[ADTickerLabel alloc] initWithFrame: CGRectMake(50, 50, 100, font.lineHeight)];
    self.tickerLabel.font = font;
    self.tickerLabel.textAlignment = NSTextAlignmentLeft;
-   self.tickerLabel.changeTextAnimationDuration = 0.5;
+   self.tickerLabel.animationDuration = 0.5;
    self.tickerLabel.scrollDirection = ADTickerLabelScrollDirectionDown;
    [self.tickerLabel setText:@"0" animated:NO];
    [self.view addSubview: self.tickerLabel];
