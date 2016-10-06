@@ -49,7 +49,7 @@
 
    self.font = [UIFont systemFontOfSize: 12.];
    self.textColor = [UIColor blackColor];
-   self.changeTextAnimationDuration = 1.0;
+   self.animationDuration = 1.0;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
@@ -176,7 +176,7 @@
    CATransition *transition = [CATransition animation];
    
    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-   transition.duration = self.changeTextAnimationDuration;
+   transition.duration = self.animationDuration;
    transition.type = kCATransitionPush;
    
    transition.subtype = scrollDirection == ADTickerLabelScrollDirectionUp ? kCATransitionFromTop : kCATransitionFromBottom;
